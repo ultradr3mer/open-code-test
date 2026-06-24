@@ -27,7 +27,7 @@ const vertexShader = /* glsl */`
   uniform float uYAmp2;
   uniform float uSpeed;
 
-  varying vec3 vWorldPos;
+  varying vec3 vLocalPos;
 
   void main() {
     vec3 pos = position;
@@ -55,7 +55,7 @@ const vertexShader = /* glsl */`
     // Final Z displacement
     pos.y += combo1 + combo2;
 
-    vWorldPos = (modelMatrix * vec4(pos, 1.0)).xyz;
+    vLocalPos = pos;
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
   }
@@ -66,10 +66,10 @@ const fragmentShader = /* glsl */`
   uniform vec3 uAmbient;
   uniform float uOpacity;
 
-  varying vec3 vWorldPos;
+  varying vec3 vLocalPos;
 
   void main() {
-    float gradient = vWorldPos.x / 8.0 + 0.5; 
+    float gradient = vLocalPos.x / 80.0 + 0.5; 
     gradient = clamp(gradient, 0.0, 1.0);
 
     gl_FragColor = vec4(uColor * gradient + uAmbient * (1.0 - gradient), uOpacity);
@@ -100,6 +100,7 @@ export default function WaveMesh() {
   const canvasRef   = useRef(null)
   const paramsRef   = useRef({ ...DEFAULTS })
   const uniformsRef = useRef(null)
+  const uniformsLowRef = useRef(null)
 
   const [params, setParams] = useState({ ...DEFAULTS })
   const [panelOpen, setPanelOpen] = useState(true)
@@ -116,6 +117,16 @@ export default function WaveMesh() {
     u.uYFreq2.value = params.yFreq2
     u.uYAmp2.value  = params.yAmp2
     u.uSpeed.value  = params.speed
+
+    const ul = uniformsLowRef.current
+    if (!ul) return
+    ul.uXFreq1.value = params.xFreq1
+    ul.uXFreq2.value = params.xFreq2
+    ul.uXAmp1.value  = params.xAmp1
+    ul.uYFreq1.value = params.yFreq1
+    ul.uYFreq2.value = params.yFreq2
+    ul.uYAmp2.value  = params.yAmp2
+    ul.uSpeed.value  = params.speed
   }, [params])
 
   const handleSlider = useCallback((key) => (e) => {
@@ -129,13 +140,13 @@ export default function WaveMesh() {
     // Renderer
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
     renderer.setPixelRatio(window.devicePixelRatio)
-    renderer.setClearColor(0x111111, 1.0)
+    renderer.setClearColor(0x111111)
 
     // Scene
     const scene = new THREE.Scene()
 
     // Camera
-    const camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000)
+    const camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 1, 100)
     camera.position.set(6, 2, 2)
     camera.lookAt(0, 0, 0)
 
@@ -149,33 +160,34 @@ export default function WaveMesh() {
       uYFreq2: { value: DEFAULTS.yFreq2 },
       uYAmp2:  { value: DEFAULTS.yAmp2  },
       uSpeed:  { value: DEFAULTS.speed  },
-      uColor:    { value: new THREE.Color(0xdedede) },
-      uAmbient:  { value: new THREE.Color(0x727272) },
+      uColor:    { value: new THREE.Color(0xffffff) },
+      uAmbient:  { value: new THREE.Color(0x494949) },
       uOpacity:  { value: 1.0 },
     }
     uniformsRef.current = uniforms
 
     // Uniforms for the low-poly overlay mesh (shared wave params, different look)
     const uniformsLow = {
-      uTime:   uniforms.uTime,
-      uXFreq1: uniforms.uXFreq1,
-      uXFreq2: uniforms.uXFreq2,
-      uXAmp1:  uniforms.uXAmp1,
-      uYFreq1: uniforms.uYFreq1,
-      uYFreq2: uniforms.uYFreq2,
-      uYAmp2:  uniforms.uYAmp2,
-      uSpeed:  uniforms.uSpeed,
+      uTime:   { value: 0 },
+      uXFreq1: { value: DEFAULTS.xFreq1 },
+      uXFreq2: { value: DEFAULTS.xFreq2 },
+      uXAmp1:  { value: DEFAULTS.xAmp1  },
+      uYFreq1: { value: DEFAULTS.yFreq1 },
+      uYFreq2: { value: DEFAULTS.yFreq2 },
+      uYAmp2:  { value: DEFAULTS.yAmp2  },
+      uSpeed:  { value: DEFAULTS.speed  },
       uColor:   { value: new THREE.Color(0x494949) },
-      uOpacity: { value: 1 },
+      uOpacity: { value: 0.65 },
     }
+    uniformsLowRef.current = uniformsLow
+
 
     // Shared transform values — derived from wave_mesh.glb, applied to both
-    const sharedOffset = new THREE.Vector3(0.1, 0.1, 0.1)
     const sharedScale  = 0.1
 
     // Load GLB
     const loader = new GLTFLoader()
-
+    
     loader.load('/wave_mesh.glb', (gltf) => {
       const meshGroup = gltf.scene
 
@@ -190,7 +202,6 @@ export default function WaveMesh() {
         }
       })
 
-      meshGroup.position.setScalar(0).add(sharedOffset)
       meshGroup.scale.setScalar(sharedScale)
       scene.add(meshGroup)
     })
@@ -211,7 +222,7 @@ export default function WaveMesh() {
       })
 
       // Apply the exact same offset and scale as the hi-res mesh
-      meshGroupLow.position.setScalar(0).add(sharedOffset).add(new THREE.Vector3(-0.1, -0.1, 0.0)) 
+      meshGroupLow.position.setY(- 0.05)
       meshGroupLow.scale.setScalar(sharedScale)
       scene.add(meshGroupLow)
     })
@@ -235,7 +246,9 @@ export default function WaveMesh() {
     function animate() {
       animId = requestAnimationFrame(animate)
       timer.update()
-      uniforms.uTime.value = timer.getElapsed()
+      const elapsed = timer.getElapsed()
+      uniforms.uTime.value = elapsed
+      uniformsLow.uTime.value = elapsed
       renderer.render(scene, camera)
     }
     animate()
