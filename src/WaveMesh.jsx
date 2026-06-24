@@ -35,7 +35,7 @@ const vertexShader = /* glsl */`
     float t = uTime * uSpeed;
 
     // --- Wave component 1 (x-based, strong) ---
-    float w1 = sin(pos.x * uXFreq1 + t) + 1.0;
+    float w1 = sin(pos.x * uXFreq1 + t * 0.5) + 1.0;
     w1 = pow(w1, 2.0) * uXAmp1;
 
     // --- Wave component 2 (z-based, soft modulator) ---
@@ -44,7 +44,7 @@ const vertexShader = /* glsl */`
     float combo1 = w1 * w2;
 
     // --- Wave component 3 (x-based, pi phase-shifted) ---
-    float w3 = sin(pos.x * uXFreq2 + 3.14159265 + t) + 1.0;
+    float w3 = sin(pos.x * uXFreq2 + 3.14159265 + t * 0.5) + 1.0;
     w3 = pow(w3, 2.0);
 
     // --- Wave component 4 (z-based, pi phase-shifted) ---
