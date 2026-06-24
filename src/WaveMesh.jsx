@@ -27,7 +27,6 @@ const vertexShader = /* glsl */`
   uniform float uYAmp2;
   uniform float uSpeed;
 
-  varying vec3 vNormal;
   varying vec3 vWorldPos;
 
   void main() {
@@ -56,7 +55,6 @@ const vertexShader = /* glsl */`
     // Final Z displacement
     pos.y += combo1 + combo2;
 
-    vNormal = normalMatrix * normal;
     vWorldPos = (modelMatrix * vec4(pos, 1.0)).xyz;
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
@@ -66,16 +64,24 @@ const vertexShader = /* glsl */`
 const fragmentShader = /* glsl */`
   uniform vec3 uColor;
   uniform vec3 uAmbient;
-  uniform vec3 uLightDir;
+  uniform float uOpacity;
 
-  varying vec3 vNormal;
   varying vec3 vWorldPos;
 
   void main() {
     float gradient = vWorldPos.x / 8.0 + 0.5; 
     gradient = clamp(gradient, 0.0, 1.0);
 
-    gl_FragColor = vec4(uColor * gradient + uAmbient * (1.0 - gradient), 1.0);
+    gl_FragColor = vec4(uColor * gradient + uAmbient * (1.0 - gradient), uOpacity);
+  }
+`
+
+const fragmentShaderFlat = /* glsl */`
+  uniform vec3 uColor;
+  uniform float uOpacity;
+
+  void main() {
+    gl_FragColor = vec4(uColor, uOpacity);
   }
 `
 
@@ -123,7 +129,7 @@ export default function WaveMesh() {
     // Renderer
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
     renderer.setPixelRatio(window.devicePixelRatio)
-    renderer.setClearColor(0x111111)
+    renderer.setClearColor(0x111111, 1.0)
 
     // Scene
     const scene = new THREE.Scene()
@@ -143,39 +149,73 @@ export default function WaveMesh() {
       uYFreq2: { value: DEFAULTS.yFreq2 },
       uYAmp2:  { value: DEFAULTS.yAmp2  },
       uSpeed:  { value: DEFAULTS.speed  },
-      uColor:  { value: new THREE.Color(0xdedede) },
+      uColor:    { value: new THREE.Color(0xdedede) },
       uAmbient:  { value: new THREE.Color(0x727272) },
-      uLightDir: { value: new THREE.Vector3(3, 5, 5).normalize() },
+      uOpacity:  { value: 1.0 },
     }
     uniformsRef.current = uniforms
 
+    // Uniforms for the low-poly overlay mesh (shared wave params, different look)
+    const uniformsLow = {
+      uTime:   uniforms.uTime,
+      uXFreq1: uniforms.uXFreq1,
+      uXFreq2: uniforms.uXFreq2,
+      uXAmp1:  uniforms.uXAmp1,
+      uYFreq1: uniforms.uYFreq1,
+      uYFreq2: uniforms.uYFreq2,
+      uYAmp2:  uniforms.uYAmp2,
+      uSpeed:  uniforms.uSpeed,
+      uColor:   { value: new THREE.Color(0x494949) },
+      uOpacity: { value: 1 },
+    }
+
+    // Shared transform values — derived from wave_mesh.glb, applied to both
+    const sharedOffset = new THREE.Vector3(0.1, 0.1, 0.1)
+    const sharedScale  = 0.1
+
     // Load GLB
     const loader = new GLTFLoader()
-    let meshGroup = null
 
     loader.load('/wave_mesh.glb', (gltf) => {
-      meshGroup = gltf.scene
+      const meshGroup = gltf.scene
 
       meshGroup.traverse((child) => {
         if (child.isMesh) {
-          // Ensure geometry has vertex positions accessible in shader
           child.geometry.computeVertexNormals()
           child.material = new THREE.ShaderMaterial({
             vertexShader,
             fragmentShader,
             uniforms,
-            side: THREE.DoubleSide,
+            side: THREE.FrontSide,
           })
         }
       })
 
-      // Center + scale
-      const box = new THREE.Box3().setFromObject(meshGroup)
-      const center = box.getCenter(new THREE.Vector3())
-      meshGroup.position.sub(center)
-      meshGroup.scale.setScalar(0.1)
-
+      meshGroup.position.setScalar(0).add(sharedOffset)
+      meshGroup.scale.setScalar(sharedScale)
       scene.add(meshGroup)
+    })
+
+    loader.load('/wave_mesh_low.glb', (gltf) => {
+      const meshGroupLow = gltf.scene
+
+      meshGroupLow.traverse((child) => {
+        if (child.isMesh) {
+          child.geometry.computeVertexNormals()
+          child.material = new THREE.ShaderMaterial({
+            vertexShader,
+            fragmentShader: fragmentShaderFlat,
+            uniforms: uniformsLow,
+            transparent: true,
+            side: THREE.FrontSide,
+          })
+        }
+      })
+
+      // Apply the exact same offset and scale as the hi-res mesh
+      meshGroupLow.position.setScalar(0).add(sharedOffset).add(new THREE.Vector3(-0.08, -0.04, 0.0)) 
+      meshGroupLow.scale.setScalar(sharedScale)
+      scene.add(meshGroupLow)
     })
 
     // Resize
