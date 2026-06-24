@@ -1,10 +1,125 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import './WaveMesh.css'
 
+// ---------------------------------------------------------------------------
+// Wave displacement vertex shader
+// Implements the node-graph formula described in the spec:
+//
+// wave1 = (sin(x * xFreq1) + 1)^2 * xAmp1          (x-based, strong)
+// wave2 = (sin(y * yFreq1) + 1) * 0.5               (y-based, soft)
+// combo1 = wave1 * wave2
+//
+// wave3 = (sin(x * xFreq1 + PI) + 1)^2             (x-based, phase-shifted)
+// wave4 = (sin(y * yFreq2 + PI) + 1) * yAmp2       (y-based, phase-shifted)
+// combo2 = wave3 * wave4
+//
+// Z offset = combo1 + combo2
+// ---------------------------------------------------------------------------
+const vertexShader = /* glsl */`
+  uniform float uTime;
+  uniform float uXFreq1;
+  uniform float uXAmp1;
+  uniform float uYFreq1;
+  uniform float uYFreq2;
+  uniform float uYAmp2;
+  uniform float uSpeed;
+
+  varying vec3 vNormal;
+  varying vec3 vWorldPos;
+
+  void main() {
+    vec3 pos = position;
+
+    float t = uTime * uSpeed;
+
+    // --- Wave component 1 (x-based, strong) ---
+    float w1 = sin(pos.x * uXFreq1 + t) + 1.0;
+    w1 = pow(w1, 2.0) * uXAmp1;
+
+    // --- Wave component 2 (y-based, soft modulator) ---
+    float w2 = (sin(pos.y * uYFreq1 + t) + 1.0) * 0.5;
+
+    float combo1 = w1 * w2;
+
+    // --- Wave component 3 (x-based, pi phase-shifted) ---
+    float w3 = sin(pos.x * uXFreq1 + 3.14159265 + t) + 1.0;
+    w3 = pow(w3, 2.0);
+
+    // --- Wave component 4 (y-based, pi phase-shifted) ---
+    float w4 = (sin(pos.y * uYFreq2 + 3.14159265 + t) + 1.0) * uYAmp2;
+
+    float combo2 = w3 * w4;
+
+    // Final Z displacement
+    pos.z += combo1 + combo2;
+
+    vNormal = normalMatrix * normal;
+    vWorldPos = (modelMatrix * vec4(pos, 1.0)).xyz;
+
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+  }
+`
+
+const fragmentShader = /* glsl */`
+  uniform vec3 uColor;
+  uniform vec3 uLightDir;
+
+  varying vec3 vNormal;
+  varying vec3 vWorldPos;
+
+  void main() {
+    vec3 n = normalize(vNormal);
+    vec3 l = normalize(uLightDir);
+
+    float diff = max(dot(n, l), 0.0);
+    float ambient = 0.35;
+    float lighting = ambient + diff * 0.65;
+
+    // subtle rim
+    vec3 viewDir = normalize(cameraPosition - vWorldPos);
+    float rim = 1.0 - max(dot(viewDir, n), 0.0);
+    rim = pow(rim, 3.0) * 0.25;
+
+    gl_FragColor = vec4(uColor * lighting + rim, 1.0);
+  }
+`
+
+// Default parameter values
+const DEFAULTS = {
+  xFreq1: 0.3,
+  xAmp1:  4.6,
+  yFreq1: 0.05,
+  yFreq2: 0.06,
+  yAmp2:  1.9,
+  speed:  0.4,
+}
+
 export default function WaveMesh() {
-  const canvasRef = useRef(null)
+  const canvasRef   = useRef(null)
+  const paramsRef   = useRef({ ...DEFAULTS })
+  const uniformsRef = useRef(null)
+
+  const [params, setParams] = useState({ ...DEFAULTS })
+  const [panelOpen, setPanelOpen] = useState(true)
+
+  // Keep ref in sync with state (used inside animate loop)
+  useEffect(() => {
+    paramsRef.current = params
+    const u = uniformsRef.current
+    if (!u) return
+    u.uXFreq1.value = params.xFreq1
+    u.uXAmp1.value  = params.xAmp1
+    u.uYFreq1.value = params.yFreq1
+    u.uYFreq2.value = params.yFreq2
+    u.uYAmp2.value  = params.yAmp2
+    u.uSpeed.value  = params.speed
+  }, [params])
+
+  const handleSlider = useCallback((key) => (e) => {
+    setParams(prev => ({ ...prev, [key]: parseFloat(e.target.value) }))
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -23,17 +138,19 @@ export default function WaveMesh() {
     camera.position.set(0, 1, 6)
     camera.lookAt(0, -1, 0)
 
-    // Lighting — subtle ambient + a bright directional to highlight the mesh
-    const ambient = new THREE.AmbientLight(0xffffff, 0.4)
-    scene.add(ambient)
-
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.2)
-    dirLight.position.set(3, 5, 5)
-    scene.add(dirLight)
-
-    const backLight = new THREE.DirectionalLight(0xcccccc, 0.4)
-    backLight.position.set(-3, -2, -4)
-    scene.add(backLight)
+    // Uniforms shared across all mesh materials
+    const uniforms = {
+      uTime:   { value: 0 },
+      uXFreq1: { value: DEFAULTS.xFreq1 },
+      uXAmp1:  { value: DEFAULTS.xAmp1  },
+      uYFreq1: { value: DEFAULTS.yFreq1 },
+      uYFreq2: { value: DEFAULTS.yFreq2 },
+      uYAmp2:  { value: DEFAULTS.yAmp2  },
+      uSpeed:  { value: DEFAULTS.speed  },
+      uColor:  { value: new THREE.Color(0xd4d4d4) },
+      uLightDir: { value: new THREE.Vector3(3, 5, 5).normalize() },
+    }
+    uniformsRef.current = uniforms
 
     // Load GLB
     const loader = new GLTFLoader()
@@ -42,31 +159,30 @@ export default function WaveMesh() {
     loader.load('/wave_mesh.glb', (gltf) => {
       meshGroup = gltf.scene
 
-      // Apply bright gray material to every mesh
       meshGroup.traverse((child) => {
         if (child.isMesh) {
-          child.material = new THREE.MeshStandardMaterial({
-            color: 0xd4d4d4,
-            roughness: 0.45,
-            metalness: 0.1,
+          // Ensure geometry has vertex positions accessible in shader
+          child.geometry.computeVertexNormals()
+          child.material = new THREE.ShaderMaterial({
+            vertexShader,
+            fragmentShader,
+            uniforms,
+            side: THREE.DoubleSide,
           })
         }
       })
 
-      // Center the model
+      // Center + scale
       const box = new THREE.Box3().setFromObject(meshGroup)
       const center = box.getCenter(new THREE.Vector3())
       meshGroup.position.sub(center)
-
-      // Scale to fit nicely
       meshGroup.scale.setScalar(0.1)
-
       meshGroup.rotation.y = 2
 
       scene.add(meshGroup)
     })
 
-    // Resize handler
+    // Resize
     function handleResize() {
       const w = canvas.clientWidth
       const h = canvas.clientHeight
@@ -75,7 +191,6 @@ export default function WaveMesh() {
       camera.updateProjectionMatrix()
     }
     handleResize()
-
     const resizeObserver = new ResizeObserver(handleResize)
     resizeObserver.observe(canvas)
 
@@ -86,8 +201,7 @@ export default function WaveMesh() {
     function animate() {
       animId = requestAnimationFrame(animate)
       timer.update()
-      const t = timer.getElapsed()
-
+      uniforms.uTime.value = timer.getElapsed()
       renderer.render(scene, camera)
     }
     animate()
@@ -100,9 +214,54 @@ export default function WaveMesh() {
     }
   }, [])
 
+  // Slider config: [key, label, min, max, step]
+  const sliders = [
+    ['xFreq1', 'X Frequency',   0.01, 2.0,  0.01],
+    ['xAmp1',  'X Amplitude',   0.0,  20.0, 0.1 ],
+    ['yFreq1', 'Y Frequency 1', 0.01, 1.0,  0.005],
+    ['yFreq2', 'Y Frequency 2', 0.01, 1.0,  0.005],
+    ['yAmp2',  'Y Amplitude 2', 0.0,  8.0,  0.1 ],
+    ['speed',  'Speed',         0.0,  3.0,  0.05],
+  ]
+
   return (
     <div className="wave-wrapper">
       <canvas ref={canvasRef} className="wave-canvas" />
+
+      <button
+        className="wave-panel-toggle"
+        onClick={() => setPanelOpen(o => !o)}
+        title="Toggle wave controls"
+      >
+        {panelOpen ? '✕' : '⚙'}
+      </button>
+
+      {panelOpen && (
+        <div className="wave-panel">
+          <div className="wave-panel-header">Wave Parameters</div>
+          {sliders.map(([key, label, min, max, step]) => (
+            <label key={key} className="wave-slider-row">
+              <span className="wave-slider-label">{label}</span>
+              <input
+                type="range"
+                min={min}
+                max={max}
+                step={step}
+                value={params[key]}
+                onChange={handleSlider(key)}
+                className="wave-slider"
+              />
+              <span className="wave-slider-value">{params[key].toFixed(2)}</span>
+            </label>
+          ))}
+          <button
+            className="wave-reset-btn"
+            onClick={() => setParams({ ...DEFAULTS })}
+          >
+            Reset
+          </button>
+        </div>
+      )}
     </div>
   )
 }
