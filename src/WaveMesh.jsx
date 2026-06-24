@@ -72,7 +72,8 @@ const fragmentShader = /* glsl */`
   varying vec3 vWorldPos;
 
   void main() {
-    float gradient = vWorldPos.x;
+    float gradient = vWorldPos.x / 8.0 + 0.5; 
+    gradient = clamp(gradient, 0.0, 1.0);
 
     gl_FragColor = vec4(uColor * gradient + uAmbient * (1.0 - gradient), 1.0);
   }
@@ -142,8 +143,8 @@ export default function WaveMesh() {
       uYFreq2: { value: DEFAULTS.yFreq2 },
       uYAmp2:  { value: DEFAULTS.yAmp2  },
       uSpeed:  { value: DEFAULTS.speed  },
-      uColor:  { value: new THREE.Color(0xd4d4d4) },
-      uAmbient:  { value: new THREE.Color(0x111111) },
+      uColor:  { value: new THREE.Color(0xdedede) },
+      uAmbient:  { value: new THREE.Color(0x727272) },
       uLightDir: { value: new THREE.Vector3(3, 5, 5).normalize() },
     }
     uniformsRef.current = uniforms
