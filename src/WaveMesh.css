@@ -1,9 +1,8 @@
 .wave-wrapper {
-  position: relative;
-  width: 100%;
-  height: calc(100vh - 56px);
+  position: fixed;
+  inset: 0;
   background: #111111;
-  overflow: hidden;
+  z-index: 0;
 }
 
 .wave-canvas {
@@ -14,8 +13,8 @@
 
 /* ---- Toggle button ---- */
 .wave-panel-toggle {
-  position: absolute;
-  top: 12px;
+  position: fixed;
+  top: 68px;
   right: 12px;
   width: 36px;
   height: 36px;
@@ -29,7 +28,7 @@
   align-items: center;
   justify-content: center;
   transition: background 0.15s;
-  z-index: 10;
+  z-index: 100;
 }
 
 .wave-panel-toggle:hover {
@@ -38,8 +37,8 @@
 
 /* ---- Slider panel ---- */
 .wave-panel {
-  position: absolute;
-  top: 56px;
+  position: fixed;
+  top: 112px;
   right: 12px;
   width: 280px;
   background: rgba(20, 20, 20, 0.88);
@@ -47,7 +46,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   padding: 14px 16px 16px;
-  z-index: 10;
+  z-index: 100;
   display: flex;
   flex-direction: column;
   gap: 10px;

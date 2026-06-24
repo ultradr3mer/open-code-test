@@ -69,7 +69,7 @@ const fragmentShader = /* glsl */`
   varying vec3 vLocalPos;
 
   void main() {
-    float gradient = vLocalPos.x / 80.0 + 0.5; 
+    float gradient = vLocalPos.x / 60.0 + 0.5; 
     gradient = clamp(gradient, 0.0, 1.0);
 
     gl_FragColor = vec4(uColor * gradient + uAmbient * (1.0 - gradient), uOpacity);
@@ -141,7 +141,9 @@ export default function WaveMesh() {
     const renderer = new THREE.WebGLRenderer({  
       canvas, 
       antialias: true,
-      premultipliedAlpha: false })
+      premultipliedAlpha: false,
+    })
+
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setClearColor(0x111111)
 
@@ -163,7 +165,7 @@ export default function WaveMesh() {
       uYFreq2: { value: DEFAULTS.yFreq2 },
       uYAmp2:  { value: DEFAULTS.yAmp2  },
       uSpeed:  { value: DEFAULTS.speed  },
-      uColor:    { value: new THREE.Color(0xeeeeee) },
+      uColor:    { value: new THREE.Color(0xbbbbbb) },
       uAmbient:  { value: new THREE.Color(0x494949) },
       uOpacity:  { value: 1.0 },
     }
@@ -200,7 +202,7 @@ export default function WaveMesh() {
             vertexShader,
             fragmentShader,
             uniforms,
-            side: THREE.FrontSide,
+            side: THREE.FrontSide
           })
         }
       })
@@ -225,7 +227,7 @@ export default function WaveMesh() {
       })
 
       // Apply the exact same offset and scale as the hi-res mesh
-      meshGroupLow.position.setY(- 0.05)
+      meshGroupLow.position.setY(- 0.02)
       meshGroupLow.scale.setScalar(sharedScale)
       scene.add(meshGroupLow)
     })

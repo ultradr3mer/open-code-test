@@ -5,22 +5,19 @@
 }
 
 body {
-  background: #0f0f0f;
+  background: #111111;
   font-family: 'Courier New', Courier, monospace;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 #root {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
   width: 100%;
 }
 
-.app-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  margin-top: 56px;
-  overflow: hidden;
+/* Scrollable layer that sits above the fixed canvas */
+.app-content {
+  position: relative;
+  z-index: 10;
+  padding-top: 56px; /* clear the fixed navbar */
 }
