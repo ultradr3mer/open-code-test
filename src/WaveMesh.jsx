@@ -181,7 +181,6 @@ export default function WaveMesh() {
 
       meshGroup.traverse((child) => {
         if (child.isMesh) {
-          child.geometry.computeVertexNormals()
           child.material = new THREE.ShaderMaterial({
             vertexShader,
             fragmentShader,
@@ -201,7 +200,6 @@ export default function WaveMesh() {
 
       meshGroupLow.traverse((child) => {
         if (child.isMesh) {
-          child.geometry.computeVertexNormals()
           child.material = new THREE.ShaderMaterial({
             vertexShader,
             fragmentShader: fragmentShaderFlat,
@@ -213,7 +211,7 @@ export default function WaveMesh() {
       })
 
       // Apply the exact same offset and scale as the hi-res mesh
-      meshGroupLow.position.setScalar(0).add(sharedOffset).add(new THREE.Vector3(-0.08, -0.04, 0.0)) 
+      meshGroupLow.position.setScalar(0).add(sharedOffset).add(new THREE.Vector3(-0.1, -0.1, 0.0)) 
       meshGroupLow.scale.setScalar(sharedScale)
       scene.add(meshGroupLow)
     })
