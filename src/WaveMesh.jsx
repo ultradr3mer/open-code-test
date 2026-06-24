@@ -11,7 +11,7 @@ import './WaveMesh.css'
 // wave2 = (sin(y * yFreq1) + 1) * 0.5               (y-based, soft)
 // combo1 = wave1 * wave2
 //
-// wave3 = (sin(x * xFreq1 + PI) + 1)^2             (x-based, phase-shifted)
+// wave3 = (sin(x * xFreq2 + PI) + 1)^2             (x-based, phase-shifted)
 // wave4 = (sin(y * yFreq2 + PI) + 1) * yAmp2       (y-based, phase-shifted)
 // combo2 = wave3 * wave4
 //
@@ -20,6 +20,7 @@ import './WaveMesh.css'
 const vertexShader = /* glsl */`
   uniform float uTime;
   uniform float uXFreq1;
+  uniform float uXFreq2;
   uniform float uXAmp1;
   uniform float uYFreq1;
   uniform float uYFreq2;
@@ -44,7 +45,7 @@ const vertexShader = /* glsl */`
     float combo1 = w1 * w2;
 
     // --- Wave component 3 (x-based, pi phase-shifted) ---
-    float w3 = sin(pos.x * uXFreq1 + 3.14159265 + t) + 1.0;
+    float w3 = sin(pos.x * uXFreq2 + 3.14159265 + t) + 1.0;
     w3 = pow(w3, 2.0);
 
     // --- Wave component 4 (z-based, pi phase-shifted) ---
@@ -64,31 +65,23 @@ const vertexShader = /* glsl */`
 
 const fragmentShader = /* glsl */`
   uniform vec3 uColor;
+  uniform vec3 uAmbient;
   uniform vec3 uLightDir;
 
   varying vec3 vNormal;
   varying vec3 vWorldPos;
 
   void main() {
-    vec3 n = normalize(vNormal);
-    vec3 l = normalize(uLightDir);
+    float gradient = vWorldPos.x;
 
-    float diff = max(dot(n, l), 0.0);
-    float ambient = 0.35;
-    float lighting = ambient + diff * 0.65;
-
-    // subtle rim
-    vec3 viewDir = normalize(cameraPosition - vWorldPos);
-    float rim = 1.0 - max(dot(viewDir, n), 0.0);
-    rim = pow(rim, 3.0) * 0.25;
-
-    gl_FragColor = vec4(uColor * lighting + rim, 1.0);
+    gl_FragColor = vec4(uColor * gradient + uAmbient * (1.0 - gradient), 1.0);
   }
 `
 
 // Default parameter values
 const DEFAULTS = {
   xFreq1: 0.3,
+  xFreq2: 0.3,
   xAmp1:  2.0,
   yFreq1: 0.05,
   yFreq2: 0.06,
@@ -110,6 +103,7 @@ export default function WaveMesh() {
     const u = uniformsRef.current
     if (!u) return
     u.uXFreq1.value = params.xFreq1
+    u.uXFreq2.value = params.xFreq2
     u.uXAmp1.value  = params.xAmp1
     u.uYFreq1.value = params.yFreq1
     u.uYFreq2.value = params.yFreq2
@@ -135,19 +129,21 @@ export default function WaveMesh() {
 
     // Camera
     const camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000)
-    camera.position.set(0, 2, 6)
+    camera.position.set(6, 2, 2)
     camera.lookAt(0, 0, 0)
 
     // Uniforms shared across all mesh materials
     const uniforms = {
       uTime:   { value: 0 },
       uXFreq1: { value: DEFAULTS.xFreq1 },
+      uXFreq2: { value: DEFAULTS.xFreq2 },
       uXAmp1:  { value: DEFAULTS.xAmp1  },
       uYFreq1: { value: DEFAULTS.yFreq1 },
       uYFreq2: { value: DEFAULTS.yFreq2 },
       uYAmp2:  { value: DEFAULTS.yAmp2  },
       uSpeed:  { value: DEFAULTS.speed  },
       uColor:  { value: new THREE.Color(0xd4d4d4) },
+      uAmbient:  { value: new THREE.Color(0x111111) },
       uLightDir: { value: new THREE.Vector3(3, 5, 5).normalize() },
     }
     uniformsRef.current = uniforms
@@ -177,7 +173,6 @@ export default function WaveMesh() {
       const center = box.getCenter(new THREE.Vector3())
       meshGroup.position.sub(center)
       meshGroup.scale.setScalar(0.1)
-      meshGroup.rotation.y = 2
 
       scene.add(meshGroup)
     })
@@ -216,7 +211,8 @@ export default function WaveMesh() {
 
   // Slider config: [key, label, min, max, step]
   const sliders = [
-    ['xFreq1', 'X Frequency',   0.01, 2.0,  0.01],
+    ['xFreq1', 'X Frequency 1', 0.01, 2.0,  0.01],
+    ['xFreq2', 'X Frequency 2', 0.01, 2.0,  0.01],
     ['xAmp1',  'X Amplitude',   0.0,  20.0, 0.1 ],
     ['yFreq1', 'Y Frequency 1', 0.01, 1.0,  0.005],
     ['yFreq2', 'Y Frequency 2', 0.01, 1.0,  0.005],
