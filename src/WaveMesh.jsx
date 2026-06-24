@@ -81,11 +81,12 @@ export default function WaveMesh() {
 
     // Animate
     let animId
-    const clock = new THREE.Clock()
+    const timer = new THREE.Timer()
 
     function animate() {
       animId = requestAnimationFrame(animate)
-      const t = clock.getElapsedTime()
+      timer.update()
+      const t = timer.getElapsed()
 
       renderer.render(scene, camera)
     }
@@ -95,6 +96,7 @@ export default function WaveMesh() {
       cancelAnimationFrame(animId)
       resizeObserver.disconnect()
       renderer.dispose()
+      timer.dispose()
     }
   }, [])
 
