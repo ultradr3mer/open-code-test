@@ -38,8 +38,8 @@ const vertexShader = /* glsl */`
     float w1 = sin(pos.x * uXFreq1 + t) + 1.0;
     w1 = pow(w1, 2.0) * uXAmp1;
 
-    // --- Wave component 2 (y-based, soft modulator) ---
-    float w2 = (sin(pos.y * uYFreq1 + t) + 1.0) * 0.5;
+    // --- Wave component 2 (z-based, soft modulator) ---
+    float w2 = (sin(pos.z * uYFreq1 + t) + 1.0) * 0.5;
 
     float combo1 = w1 * w2;
 
@@ -47,13 +47,13 @@ const vertexShader = /* glsl */`
     float w3 = sin(pos.x * uXFreq1 + 3.14159265 + t) + 1.0;
     w3 = pow(w3, 2.0);
 
-    // --- Wave component 4 (y-based, pi phase-shifted) ---
-    float w4 = (sin(pos.y * uYFreq2 + 3.14159265 + t) + 1.0) * uYAmp2;
+    // --- Wave component 4 (z-based, pi phase-shifted) ---
+    float w4 = (sin(pos.z * uYFreq2 + 3.14159265 + t) + 1.0) * uYAmp2;
 
     float combo2 = w3 * w4;
 
     // Final Z displacement
-    pos.z += combo1 + combo2;
+    pos.y += combo1 + combo2;
 
     vNormal = normalMatrix * normal;
     vWorldPos = (modelMatrix * vec4(pos, 1.0)).xyz;
@@ -89,11 +89,11 @@ const fragmentShader = /* glsl */`
 // Default parameter values
 const DEFAULTS = {
   xFreq1: 0.3,
-  xAmp1:  4.6,
+  xAmp1:  2.0,
   yFreq1: 0.05,
   yFreq2: 0.06,
-  yAmp2:  1.9,
-  speed:  0.4,
+  yAmp2:  1.2,
+  speed:  0.15,
 }
 
 export default function WaveMesh() {
@@ -135,8 +135,8 @@ export default function WaveMesh() {
 
     // Camera
     const camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000)
-    camera.position.set(0, 1, 6)
-    camera.lookAt(0, -1, 0)
+    camera.position.set(0, 2, 6)
+    camera.lookAt(0, 0, 0)
 
     // Uniforms shared across all mesh materials
     const uniforms = {
