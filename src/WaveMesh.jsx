@@ -138,7 +138,10 @@ export default function WaveMesh() {
     if (!canvas) return
 
     // Renderer
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
+    const renderer = new THREE.WebGLRenderer({  
+      canvas, 
+      antialias: true,
+      premultipliedAlpha: false })
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setClearColor(0x111111)
 
@@ -160,7 +163,7 @@ export default function WaveMesh() {
       uYFreq2: { value: DEFAULTS.yFreq2 },
       uYAmp2:  { value: DEFAULTS.yAmp2  },
       uSpeed:  { value: DEFAULTS.speed  },
-      uColor:    { value: new THREE.Color(0xffffff) },
+      uColor:    { value: new THREE.Color(0xeeeeee) },
       uAmbient:  { value: new THREE.Color(0x494949) },
       uOpacity:  { value: 1.0 },
     }
