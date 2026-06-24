@@ -20,4 +20,5 @@ body {
   position: relative;
   z-index: 10;
   padding-top: 56px; /* clear the fixed navbar */
+  pointer-events: none;
 }

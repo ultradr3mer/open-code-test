@@ -103,7 +103,7 @@ export default function WaveMesh() {
   const uniformsLowRef = useRef(null)
 
   const [params, setParams] = useState({ ...DEFAULTS })
-  const [panelOpen, setPanelOpen] = useState(true)
+  const [panelOpen, setPanelOpen] = useState(false)
 
   // Keep ref in sync with state (used inside animate loop)
   useEffect(() => {
