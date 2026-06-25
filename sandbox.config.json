@@ -1,3 +1,10 @@
 {
-  "node": 22
+  "infiniteLoopProtection": true,
+  "hardReloadOnChange": false,
+  "template": "node",
+  "view": "terminal",
+  "container": {
+    "node": "22"
+  },
+  "node": "22"
 }
