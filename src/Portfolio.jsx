@@ -29,8 +29,10 @@ export default function Portfolio() {
       {/* Hero */}
       <section className="pf-hero glass">
         <p className="pf-eyebrow">Creative Developer</p>
+        <div className="hero-image-background">
         <div className="pf-hero-image" aria-label="Jane Doe">
           <div className="pf-hero-name">//CLARA</div>
+        </div>
         </div>
         <p className="pf-tagline">
           I build interactive experiences where design meets code —<br />
@@ -52,7 +54,9 @@ export default function Portfolio() {
         {projects.map(p => (
           <article key={p.title} className="pf-card glass">
             <div className="pf-card-meta">
-              <span className="pf-tag">{p.tag}</span>
+              <span className="tag-background">
+                <span className="pf-tag">{p.tag}</span>
+              </span>
               <span className="pf-year">{p.year}</span>
             </div>
             <h2 className="pf-card-title">{p.title}</h2>
