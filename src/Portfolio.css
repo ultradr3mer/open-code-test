@@ -1,13 +1,30 @@
 /* ---------------------------------------------------------------
-   Shared glass utility
+   Shared shadow helper (invisible container, only shadow visible)
+--------------------------------------------------------------- */
+.shadow-wrap {
+  position: relative;
+}
+
+.shadow-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 12px 80px 24px rgba(0, 0, 0, 0.75);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------
+   Shared glass utility (project cards)
 --------------------------------------------------------------- */
 .glass {
   position: relative;
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  background: rgba(40, 40, 40, 0.3);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
 }
 
 .glass::before {
@@ -15,13 +32,13 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  box-shadow: 0 8px 80px 20px rgba(0, 0, 0, 0.3);
-  z-index: -1;
+  box-shadow: 0 10px 80px 24px rgba(0, 0, 0, 0.5);
+  z-index: -100;
   pointer-events: none;
 }
 
 /* ---------------------------------------------------------------
-   Scroll container — sits above the fixed canvas
+   Scroll container
 --------------------------------------------------------------- */
 .pf-overlay {
   position: relative;
@@ -29,84 +46,138 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
   padding: 40px 24px 80px;
   min-height: 100vh;
-  pointer-events: none; /* let clicks fall through to canvas by default */
+  pointer-events: none;
+  font-family: 'Lato', Arial, monospace;
 }
 
-/* re-enable interaction on actual content */
 .pf-overlay > * {
   pointer-events: auto;
 }
 
 /* ---------------------------------------------------------------
-   Hero card
+   Hero — dark opaque card, no glass blur
 --------------------------------------------------------------- */
 .pf-hero {
+  position: relative;
   width: 100%;
-  max-width: 680px;
-  padding: 48px 48px 40px;
+  max-width: 800px;
+  padding: 28px 28px 32px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  gap: 20px;
+  /* background: rgba(22, 22, 22, 0.95); */
+  /* border: 1px solid rgba(255, 255, 255, 0.07); */
+  border-radius: 16px;
+  z-index: 100;
+  text-align: center;
 }
 
 .pf-eyebrow {
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.3);
 }
 
-.pf-name {
-  font-size: clamp(2.2rem, 5vw, 3.2rem);
+/* Orange image placeholder */
+.pf-hero-image {
+  --cut: 40px;
+
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%
+  );
+
+  width: 100%;
+  height: 130px;
+  background: #e84f00;
+  /* border-radius: 0 6px 6px 0; */
+  flex-shrink: 0;
+  margin-left: -57px;
+  opacity: 0.9;
+}
+
+.pf-hero-name {
+  color: black;
+  font-family: Bahnschrift;
   font-weight: 700;
-  color: #f0f0f0;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  font-size: 6em;
+  height: 100%;
+  overflow: hidden;
+  align-content: end;
+  padding: 16px;
+  text-shadow: 7px 7px 0px #ff9058;
 }
 
 .pf-tagline {
-  font-size: 15px;
-  line-height: 1.65;
-  color: rgba(255, 255, 255, 0.55);
-  font-family: 'Courier New', Courier, monospace;
+  font-size: 1em;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 /* Skills row */
 .pf-skills {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
-  margin-top: 4px;
 }
 
 .pf-skill-tag {
-  font-size: 11px;
+  --cut: 10px;
+
+  clip-path: polygon(
+    0 var(--cut),
+    var(--cut) 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%
+  );
+
+  font-size: 1em;
   font-weight: 500;
-  letter-spacing: 0.05em;
-  padding: 4px 10px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.05);
+  letter-spacing: 0.03em;
+  padding: 5px 14px;
+  /* border-radius: 4px; */
+  /* border: 1px solid rgba(255, 255, 255, 0.18); */
+  color: rgba(0, 0, 0, 0.9);
+  background: rgba(255, 255, 255, 0.6);
+  z-index: 110;
+  position: relative;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.5));
+}
+
+.pf-skill-tag::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  /* box-shadow doesn't escape clip-path — use filter on the parent instead */
 }
 
 /* CTA buttons */
 .pf-cta-row {
   display: flex;
   gap: 12px;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .pf-btn {
   display: inline-flex;
   align-items: center;
-  padding: 10px 22px;
+  padding: 11px 26px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 1em;
   font-weight: 600;
   letter-spacing: 0.02em;
   text-decoration: none;
@@ -115,7 +186,7 @@
 }
 
 .pf-btn-primary {
-  background: rgba(255, 255, 255, 0.9);
+  background: #e8e8e8;
   color: #111;
   border: 1px solid transparent;
 }
@@ -125,15 +196,15 @@
 }
 
 .pf-btn-ghost {
-  background: transparent;
-  color: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .pf-btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.13);
   color: #fff;
-  border-color: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.28);
 }
 
 /* ---------------------------------------------------------------
@@ -141,23 +212,23 @@
 --------------------------------------------------------------- */
 .pf-projects {
   width: 100%;
-  max-width: 680px;
+  max-width: 800px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
 }
 
 .pf-card {
-  padding: 28px 28px 24px;
+  padding: 24px 24px 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   transition: background 0.2s, border-color 0.2s;
+  z-index: 100;
 }
 
 .pf-card:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(40, 40, 40, 0.9);
 }
 
 .pf-card-meta {
@@ -167,48 +238,60 @@
 }
 
 .pf-tag {
-  font-size: 10px;
+  --cut: 10px;
+
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%
+  );
+
+  font-size: 1.2em;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 4px;
-  background: rgba(126, 184, 247, 0.15);
-  color: #7eb8f7;
-  border: 1px solid rgba(126, 184, 247, 0.25);
+  padding: 7px 8px 3px 16px;
+  /* border-radius: 0px 4px 4px 0px; */
+  background: #e84f00;
+  color: black;
+  margin-left: -24px;
+  /* padding-bottom: 0px; */
+  text-shadow: 2px 2px 0px #ff9058;
+  opacity: 0.9;
 }
 
 .pf-year {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.25);
+  font-size: 1em;
+  color: rgba(255, 255, 255, 0.22);
   font-variant-numeric: tabular-nums;
 }
 
 .pf-card-title {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
-  color: #e8e8e8;
+  color: #e0e0e0;
   letter-spacing: -0.01em;
 }
 
 .pf-card-desc {
-  font-size: 13px;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.45);
-  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.2em;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.38);
   flex: 1;
 }
 
 .pf-card-link {
-  font-size: 12px;
+  font-size: 1em;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
   text-decoration: none;
   letter-spacing: 0.02em;
   transition: color 0.15s;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .pf-card-link:hover {
-  color: #fff;
+  color: #e84f00;
 }

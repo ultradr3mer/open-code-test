@@ -29,7 +29,9 @@ export default function Portfolio() {
       {/* Hero */}
       <section className="pf-hero glass">
         <p className="pf-eyebrow">Creative Developer</p>
-        <h1 className="pf-name">Jane Doe</h1>
+        <div className="pf-hero-image" aria-label="Jane Doe">
+          <div className="pf-hero-name">//CLARA</div>
+        </div>
         <p className="pf-tagline">
           I build interactive experiences where design meets code —<br />
           from pixel-perfect interfaces to real-time 3D.
