@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './Portfolio.css'
 import portfolioData from './portfolio.json'
 import GalleryModal from './GalleryModal'
+import Timeline from './Timeline'
 
 const skills = ['Three.js', 'GLSL', 'React', 'TypeScript', 'Figma', 'Node.js']
 
@@ -38,6 +39,7 @@ export default function Portfolio() {
       </section>
 
       {/* Projects */}
+      <h2 className="pf-section-title">Projects</h2>
       <section className="pf-projects">
         {projects.map(p => (
           <article key={p.name} className="pf-card glass" onClick={() => openGallery(p)}>
@@ -52,6 +54,9 @@ export default function Portfolio() {
           </article>
         ))}
       </section>
+
+      {/* Timeline */}
+      <Timeline />
 
       {/* Gallery Modal */}
       {activeProject && (

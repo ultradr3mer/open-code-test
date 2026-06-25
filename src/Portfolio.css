@@ -233,9 +233,24 @@
   transform: translateY(-2px);
 }
 
+.pf-card-icon-mirror {
+  --cut: 12px;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 100%,
+    var(--cut) 100%,
+    0 calc(100% - var(--cut))
+  );
+}
+
 .pf-card-icon {
    --cut: 12px;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%);
+  
+}
+
+.pf-card-icon, .pf-card-icon-mirror {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -251,11 +266,28 @@
 .tag-background {
   --cut: 12px;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%);
-  font-size: 1.2em;
+  padding: 1px 5px 2px 0px;
+}
+
+.tag-background-mirror {
+  --cut: 12px;
+
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 100%,
+    var(--cut) 100%,
+    0 calc(100% - var(--cut))
+  );
+
+  padding: 1px 0px 2px 5px;
+}
+
+.tag-background, .tag-background-mirror {
+    font-size: 1.2em;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 1px 5px 2px 0px;
   background: #0000005e;
   color: black;
   margin-left: -24px;
@@ -354,6 +386,34 @@
 
 /* Text über dem Gradient halten */
 .hover-gradient-dark > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hover-gradient-mirror {
+  position: relative;
+  overflow: hidden;
+  background: #0000005e;
+}
+
+/* Gradient Layer */
+.hover-gradient-mirror::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #e84f00, transparent);
+  transform: translateX(-100%);
+  transition: transform 0.4s ease;
+  z-index: 0;
+}
+
+/* Hover Effekt */
+.hover-gradient-mirror:hover::before {
+  transform: translateX(0);
+}
+
+/* Text über dem Gradient halten */
+.hover-gradient-mirror > * {
   position: relative;
   z-index: 1;
 }
@@ -505,4 +565,101 @@
   flex-wrap: wrap;
   gap: 10px;
   padding: 16px 28px 24px;
+}
+
+/* ---------------------------------------------------------------
+   Section titles
+--------------------------------------------------------------- */
+.pf-section-title {
+  width: 100%;
+  max-width: 800px;
+  margin: 8px 0 4px;
+  font-size: 1.3em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------------------------------------------------------------
+   Timeline
+--------------------------------------------------------------- */
+.pf-timeline {
+  width: 100%;
+  max-width: 800px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+
+@media (max-width: 720px) {
+  .pf-timeline {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pf-timeline-column {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pf-timeline-item {
+  position: relative;
+  display: flex;
+  gap: 0px;
+  align-items: flex-start;
+}
+
+.pf-timeline-marker {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #0000005e;
+}
+
+.pf-timeline-marker img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pf-timeline-content {
+  flex: 1;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pf-timeline-period {
+  font-size: 0.8em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e84f00;
+}
+
+.pf-timeline-title {
+  margin: 0;
+  font-size: 1em;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.pf-timeline-org {
+  margin: 0;
+  font-size: 0.9em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.pf-timeline-desc {
+  margin: 2px 0 0;
+  font-size: 0.85em;
+  color: rgba(255, 255, 255, 0.38);
+  line-height: 1.5;
 }

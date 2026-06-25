@@ -1,0 +1,56 @@
+{
+  "professional": [
+    {
+      "role": "Senior Software Developer",
+      "company": "eEvolution GmbH & Co. KG",
+      "period": {
+        "from": "2015-02",
+        "to": "current"
+      },
+      "description": "Current since Feb 2015",
+      "image": "/images/eEvolution.jpg"
+    },
+    {
+      "role": "Fachinformatikerin Anwendungsentwicklung i.A.",
+      "company": "ViA-Online GmbH",
+      "period": {
+        "from": "2014-11",
+        "to": "2015-01"
+      },
+      "description": "3 months, Nov 2014 - Jan 2015",
+      "image": "/images/afterbuy.jpg"
+    },
+    {
+      "role": "Fachinformatikerin Anwendungsentwicklung i.A.",
+      "company": "SA Service Alliance GmbH & Co. KG",
+      "period": {
+        "from": "2012-07",
+        "to": "2014-12"
+      },
+      "description": "2 years and 6 months, Jul 2012 - Dec 2014",
+      "image": "/images/servicealliance.png"
+    }
+  ],
+  "education": [
+    {
+      "program": "Informationsmanagement und Informationstechnologie (IMIT)",
+      "institution": "Universität Hildesheim",
+      "period": {
+        "from": "2021-10",
+        "to": "current"
+      },
+      "description": "Current since Oct 2021",
+      "image": "/images/UniHildesheim.png"
+    },
+    {
+      "program": "Fachinformatikerin Anwendungsentwicklung",
+      "institution": "Berufskolleg Platz der Republik",
+      "period": {
+        "from": "2012-07",
+        "to": "2015-01"
+      },
+      "description": "2 years and 7 months, Jul 2012 - Jan 2015",
+      "image": "/images/bktm.png"
+    }
+  ]
+}
