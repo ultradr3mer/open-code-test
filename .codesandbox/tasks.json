@@ -2,14 +2,6 @@
   // These tasks will run in order when initializing your CodeSandbox project.
   "setupTasks": [
     {
-      "command": "nvm install 20",
-      "name": "Installing Node 20"
-    },
-    {
-      "command": "nvm use 20",
-      "name": "Using Node 20"
-    },
-    {
       "command": "npm install",
       "name": "Installing Dependencies"
     }
