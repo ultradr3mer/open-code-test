@@ -1,0 +1,90 @@
+[
+  {
+    "name": "Advanced Clipboard",
+    "description": "Tool to organize and share data between Windows and Android.",
+    "images": [
+      "/images/screenshots/ClipboardDesktop.jpg",
+      "/images/screenshots/ClipboardAndroid.jpg"
+    ],
+    "icon": "/images/ClipboardIcon_rectangle.png",
+    "links": {
+      "github": [
+        "https://github.com/ultradr3mer/AdvancedClipboard.Wpf",
+        "https://github.com/ultradr3mer/AdvancedClipboard.Server",
+        "https://github.com/ultradr3mer/AdvancedClipboard.Android"
+      ]
+    }
+  },
+  {
+    "name": "Handshake",
+    "description": "Social network built upon the Xamarin Framework.",
+    "images": [
+      "/images/screenshots/Handshake1.jpg",
+      "/images/screenshots/Handshake2.jpg",
+      "/images/screenshots/Handshake3.jpg"
+    ],
+    "icon": "/images/handshake.png",
+    "links": {
+      "github": [
+        "https://github.com/ultradr3mer/handshakeClientCompatible",
+        "https://github.com/ultradr3mer/handshake",
+        "https://github.com/ultradr3mer/handshakeClient"
+      ]
+    }
+  },
+  {
+    "name": "QEntangle",
+    "description": "Website allowing interaction based on a quantum particle in superposition.",
+    "images": [
+      "/images/screenshots/Entangle2.PNG",
+      "/images/screenshots/Entangle.PNG"
+    ],
+    "icon": "/images/qentangle.png",
+    "links": {
+      "website": "https://qentangle.net/",
+      "github": [
+        "https://github.com/ultradr3mer/QEntangle.Web"
+      ]
+    }
+  },
+  {
+    "name": "RegExRazorReplace",
+    "description": "Search and replace tool using Regex for matching and Razor for generation.",
+    "images": [
+      "/images/screenshots/RegexRazor.PNG"
+    ],
+    "icon": "/images/rera_icon.png",
+    "links": {
+      "github": [
+        "https://github.com/ultradr3mer/RegExRazorReplace"
+      ]
+    }
+  },
+  {
+    "name": "AddToWa",
+    "description": "Program to add single contacts to WhatsApp.",
+    "images": [
+      "/images/screenshots/AddToWa.jpg"
+    ],
+    "icon": "/images/addtowa.png",
+    "links": {
+      "github": [
+        "https://github.com/ultradr3mer/AddToWA"
+      ]
+    }
+  },
+  {
+    "name": "Third party Spotify player",
+    "description": "Third-party Spotify player implementation in UWP.",
+    "images": [
+      "/images/screenshots/UwpSpotify1.png",
+      "/images/screenshots/UwpSpotify2.png"
+    ],
+    "icon": "/images/spotifyuwp.png",
+    "links": {
+      "github": [
+        "https://github.com/ultradr3mer/Spotify"
+      ]
+    }
+  }
+]
