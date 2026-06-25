@@ -18,7 +18,7 @@ export default function Portfolio() {
       <section className="pf-hero glass">
         <p className="pf-eyebrow">Creative Developer</p>
         <div className="hero-image-background hover-gradient">
-        <div className="pf-hero-image" aria-label="Jane Doe">
+        <div className="pf-hero-image hover-gradient-dark" aria-label="Jane Doe">
           <div className="pf-hero-name">//CLARA</div>
         </div>
         </div>

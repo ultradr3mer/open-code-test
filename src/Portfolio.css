@@ -113,8 +113,7 @@
 
   width: 100%;
   height: 100%;
-  background: #e84f00;
-  /* border-radius: 0 6px 6px 0; */
+  background: #ff5700;
   flex-shrink: 0;
   opacity: 0.9;
 }
@@ -327,6 +326,34 @@
 
 /* Text über dem Gradient halten */
 .hover-gradient > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hover-gradient-dark {
+  position: relative;
+  overflow: hidden;
+  background: #ff5700ff;
+}
+
+/* Gradient Layer */
+.hover-gradient-dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, #0000005e);
+  transform: translateX(+100%);
+  transition: transform 0.4s ease;
+  z-index: 0;
+}
+
+/* Hover Effekt */
+.hover-gradient-dark:hover::before {
+  transform: translateX(0);
+}
+
+/* Text über dem Gradient halten */
+.hover-gradient-dark > * {
   position: relative;
   z-index: 1;
 }
