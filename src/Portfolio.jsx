@@ -1,42 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import './Portfolio.css'
 import portfolioData from './portfolio.json'
+import GalleryModal from './GalleryModal'
 
 const skills = ['Three.js', 'GLSL', 'React', 'TypeScript', 'Figma', 'Node.js']
 
 export default function Portfolio() {
   const [projects] = useState(portfolioData)
   const [activeProject, setActiveProject] = useState(null)
-  const [activeImage, setActiveImage] = useState(0)
 
-  useEffect(() => {
-    if (!activeProject) return
-    const onKey = (e) => {
-      if (e.key === 'Escape') setActiveProject(null)
-      if (e.key === 'ArrowRight') setActiveImage((i) => (i + 1) % activeProject.images.length)
-      if (e.key === 'ArrowLeft')
-        setActiveImage((i) => (i - 1 + activeProject.images.length) % activeProject.images.length)
-    }
-    window.addEventListener('keydown', onKey)
-    document.body.style.overflow = 'hidden'
-    return () => {
-      window.removeEventListener('keydown', onKey)
-      document.body.style.overflow = ''
-    }
-  }, [activeProject])
-
-  const openGallery = (project) => {
-    setActiveProject(project)
-    setActiveImage(0)
-  }
-
+  const openGallery = (project) => setActiveProject(project)
   const closeGallery = () => setActiveProject(null)
-
-  const linkEntries = activeProject
-    ? Object.entries(activeProject.links).flatMap(([type, value]) =>
-        Array.isArray(value) ? value.map((v) => [type, v]) : [[type, value]]
-      )
-    : []
 
   return (
     <div className="pf-overlay">
@@ -81,52 +55,7 @@ export default function Portfolio() {
 
       {/* Gallery Modal */}
       {activeProject && (
-        <div className="pf-gallery-overlay" onClick={closeGallery}>
-          <div className="pf-gallery" onClick={(e) => e.stopPropagation()}>
-            <button className="pf-gallery-close" onClick={closeGallery} aria-label="Close">&times;</button>
-            <div className="pf-gallery-header">
-              <h2>{activeProject.name}</h2>
-              <p>{activeProject.description}</p>
-            </div>
-            <div className="pf-gallery-stage">
-              {activeProject.images.length > 1 && (
-                <button
-                  className="pf-gallery-nav pf-gallery-prev"
-                  onClick={() => setActiveImage((i) => (i - 1 + activeProject.images.length) % activeProject.images.length)}
-                  aria-label="Previous"
-                >&lsaquo;</button>
-              )}
-              <img className="pf-gallery-image" src={activeProject.images[activeImage]} alt={activeProject.name} />
-              {activeProject.images.length > 1 && (
-                <button
-                  className="pf-gallery-nav pf-gallery-next"
-                  onClick={() => setActiveImage((i) => (i + 1) % activeProject.images.length)}
-                  aria-label="Next"
-                >&rsaquo;</button>
-              )}
-            </div>
-            {activeProject.images.length > 1 && (
-              <div className="pf-gallery-thumbs">
-                {activeProject.images.map((img, i) => (
-                  <button
-                    key={img}
-                    className={'pf-gallery-thumb' + (i === activeImage ? ' active' : '')}
-                    onClick={() => setActiveImage(i)}
-                  >
-                    <img src={img} alt="" />
-                  </button>
-                ))}
-              </div>
-            )}
-            <div className="pf-gallery-links">
-              {linkEntries.map(([type, url]) => (
-                <a key={url} className="pf-btn pf-btn-ghost" href={url} target="_blank" rel="noreferrer">
-                  {type === 'github' ? 'GitHub' : type.charAt(0).toUpperCase() + type.slice(1)} &rarr;
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
+        <GalleryModal project={activeProject} onClose={closeGallery} />
       )}
     </div>
   )
