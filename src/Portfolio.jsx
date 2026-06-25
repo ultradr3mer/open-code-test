@@ -19,9 +19,9 @@ export default function Portfolio() {
       <section className="pf-hero glass">
         <p className="pf-eyebrow">Creative Developer</p>
         <div className="hero-image-background hover-gradient">
-        <div className="pf-hero-image hover-gradient-dark" aria-label="Jane Doe">
-          <div className="pf-hero-name">//CLARA</div>
-        </div>
+          <div className="pf-hero-image hover-gradient-dark" aria-label="Jane Doe">
+            <div className="pf-hero-name">//CLARA</div>
+          </div>
         </div>
         <p className="pf-tagline">
           I build interactive experiences where design meets code —<br />
@@ -47,8 +47,8 @@ export default function Portfolio() {
               <span className="tag-background hover-gradient">
                 <img className="pf-card-icon" src={p.icon} alt="" />
               </span>
+              <h2 className="pf-card-title">{p.name}</h2>
             </div>
-            <h2 className="pf-card-title">{p.name}</h2>
             <p className="pf-card-desc">{p.description}</p>
             <span className="pf-card-link">View project &rarr;</span>
           </article>

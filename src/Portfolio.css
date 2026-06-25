@@ -21,8 +21,8 @@
 .glass {
   position: relative;
   background: rgba(40, 40, 40, 0.3);
-  backdrop-filter: blur(12px) saturate(1.2);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 4px;
 }
@@ -260,7 +260,7 @@
 .pf-card-meta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .tag-background {
@@ -311,6 +311,7 @@
   font-weight: 600;
   color: #e0e0e0;
   letter-spacing: -0.01em;
+  margin-left: 24px;
 }
 
 .pf-card-desc {
