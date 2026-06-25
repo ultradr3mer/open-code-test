@@ -29,7 +29,7 @@ export default function Portfolio() {
       {/* Hero */}
       <section className="pf-hero glass">
         <p className="pf-eyebrow">Creative Developer</p>
-        <div className="hero-image-background">
+        <div className="hero-image-background hover-gradient">
         <div className="pf-hero-image" aria-label="Jane Doe">
           <div className="pf-hero-name">//CLARA</div>
         </div>
@@ -54,7 +54,7 @@ export default function Portfolio() {
         {projects.map(p => (
           <article key={p.title} className="pf-card glass">
             <div className="pf-card-meta">
-              <span className="tag-background">
+              <span className="tag-background hover-gradient">
                 <span className="pf-tag">{p.tag}</span>
               </span>
               <span className="pf-year">{p.year}</span>

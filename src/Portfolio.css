@@ -91,15 +91,11 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 7px 10px 5px 0px;
-  background: #0000005e;
+  padding: 3px 10px 5px 0px;
   color: black;
-  padding-top: -10px;
-    margin-left: -57px;
-
+  margin-left: -57px;
   opacity: 0.9;
-
-    width: 100%;
+  width: 100%;
   height: 140px;
 }
 
@@ -249,7 +245,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 7px 10px 5px 0px;
+  padding: 7px 3px 4px 0px;
   background: #0000005e;
   color: black;
   padding-top: -10px;
@@ -312,4 +308,32 @@
 
 .pf-card-link:hover {
   color: #e84f00;
+}
+
+.hover-gradient {
+  position: relative;
+  overflow: hidden;
+  background: #0000005e;
+}
+
+/* Gradient Layer */
+.hover-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, #e84f00);
+  transform: translateX(+100%);
+  transition: transform 0.4s ease;
+  z-index: 0;
+}
+
+/* Hover Effekt */
+.hover-gradient:hover::before {
+  transform: translateX(0);
+}
+
+/* Text über dem Gradient halten */
+.hover-gradient > * {
+  position: relative;
+  z-index: 1;
 }
